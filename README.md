@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 2025 Data Science task
 
 
@@ -31,3 +32,6 @@ The rmd should be uploaded on this link (https://docs.google.com/forms/d/e/1FAIp
 
 
 
+=======
+# data_analysis
+>>>>>>> 3e3dba1573fa99c0a63326f691fa9d9df127a178
