@@ -1,0 +1,30 @@
+# Python bytecode files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment
+venv/
+.venv/
+env/
+vinnie_venv
+
+# Django migrations
+*/migrations/*
+
+# SQLite database
+db.sqlite3
+
+# Media and static files
+/media/
+static/
+
+# IDEs
+.idea/
+.vscode/
+
+# Logs and temporary files
+*.log
+*.bak
+ 
