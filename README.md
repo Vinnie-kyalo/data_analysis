@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 # 2025 Data Science task
 
 
@@ -30,8 +30,5 @@ Kindly ensure you show the code in your data.
 The rmd should be uploaded on this link (https://docs.google.com/forms/d/e/1FAIpQLSd2gFkhTt1KP9vb74pYCsvFgrO0QZb_1js5fK2Aak-phAYxiA/viewform?usp=sharing ) by this 27th April 2025 at 8pm EAT. Kindly note that documents uploaded past the deadline will not be considered.
 
 
-
-
-=======
 # data_analysis
->>>>>>> 3e3dba1573fa99c0a63326f691fa9d9df127a178
+
