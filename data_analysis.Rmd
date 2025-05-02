@@ -1,0 +1,182 @@
+```{r}
+library(tidyverse)
+hiv_data <- read_csv("HIV data 2000-2023.csv")
+glimpse(hiv_data)
+```
+
+
+```{r}
+# Extract only the numeric part (estimate) from 'Value' column
+hiv_data_cleaned <- hiv_data %>%
+  mutate(Value_clean = str_extract(Value, "^\\d{1,3}(?: \\d{3})*") %>%
+                        str_remove_all(" ") %>%
+                        as.numeric())
+```
+
+
+```{r}
+hiv_living <- hiv_data_cleaned %>%
+  filter(str_detect(str_to_lower(Indicator), "people \\(all ages\\) living with hiv"))
+```
+
+
+```{r}
+hiv_latest <- hiv_living %>%
+  filter(Period == 2023) %>%
+  group_by(Location) %>%
+  summarise(HIV_estimate = sum(Value_clean, na.rm = TRUE)) %>%
+  arrange(desc(HIV_estimate))
+```
+
+
+```{r}
+hiv_top75 <- hiv_latest %>%
+  mutate(cum_percent = cumsum(HIV_estimate) / sum(HIV_estimate)) %>%
+  filter(cum_percent <= 0.75)
+```
+
+
+```{r}
+top_countries <- hiv_top75$Location
+
+hiv_living %>%
+  filter(Location %in% top_countries) %>%
+  ggplot(aes(x = Period, y = Value_clean, color = Location)) +
+  geom_line() +
+  labs(
+    title = "Trend of People Living with HIV in Top 75% Burden Countries",
+    x = "Year",
+    y = "Estimated People Living with HIV"
+  ) +
+  theme_minimal()
+```
+
+
+```{r}
+# Regional HIV estimates for the year 2023
+regional_summary <- hiv_living %>% 
+  filter(Period == 2023) %>% 
+  group_by(ParentLocationCode, ParentLocation) %>% 
+  summarise(Regional_HIV_Estimate = sum(Value_clean, na.rm = TRUE), .groups = "drop") %>% 
+  arrange(desc(Regional_HIV_Estimate))
+
+print(regional_summary)
+```
+
+
+```{r}
+library(readxl)
+poverty_data <- read_excel("multidimensional_poverty.xlsx")
+```
+
+
+```{r}
+# Check the column names in both datasets
+colnames(hiv_living)
+colnames(poverty_data)
+```
+
+
+```{r}
+# Remove the unwanted columns with names like '...2', '...3', etc.
+poverty_data_cleaned <- poverty_data %>%
+  select(-starts_with("..."))
+```
+
+
+```{r}
+# Trim any leading or trailing spaces
+poverty_data_cleaned <- poverty_data_cleaned %>%
+  mutate(
+    Location = str_trim(Location),
+    Period = str_trim(Period)
+  )
+```
+
+
+```{r}
+# Print column names to confirm if Location exists
+colnames(poverty_data_cleaned)
+```
+
+
+```{r}
+# Remove the first column that contains metadata (it's likely the first column)
+poverty_data_cleaned <- poverty_data[, -1]
+
+# Check the column names again to see if they are cleaned up
+colnames(poverty_data_cleaned)
+
+# If there are any strange column names (e.g., extra spaces), we can clean them up
+colnames(poverty_data_cleaned) <- str_trim(colnames(poverty_data_cleaned))
+
+# View the first few rows to ensure everything is in order
+head(poverty_data_cleaned)
+```
+
+
+```{r}
+# Rename columns to something meaningful
+poverty_data_cleaned <- poverty_data_cleaned %>%
+  rename(
+    Location = "...2",   # Adjust based on your column names
+    Period = "...3"      # Adjust based on your column names
+  )
+```
+
+
+```{r}
+# Trim leading and trailing spaces from the data as well
+poverty_data_cleaned <- poverty_data_cleaned %>%
+  mutate(
+    Location = str_trim(Location),
+    Period = str_trim(Period)
+  )
+```
+
+
+```{r}
+# Perform the join again
+merged_data <- hiv_living %>%
+  filter(!is.na(Value_clean)) %>%
+  inner_join(poverty_data_cleaned, by = c("Location", "Period"))
+```
+
+
+```{r}
+hiv_living <- hiv_living %>%
+  mutate(Period = as.character(Period))
+```
+
+
+```{r}
+poverty_data_cleaned <- poverty_data_cleaned %>%
+  mutate(Period = as.character(Period))
+
+```
+
+
+```{r}
+merged_data <- hiv_living %>%
+  filter(!is.na(Value_clean)) %>%
+  inner_join(poverty_data_cleaned, by = c("Location", "Period"))
+```
+
+
+```{r}
+# Check the first few rows of the merged dataset
+head(merged_data)
+```
+
+
+```{r}
+# Check unique values in `Location` and `Period` in both datasets
+unique(hiv_living$Location)
+unique(poverty_data_cleaned$Location)
+
+unique(hiv_living$Period)
+unique(poverty_data_cleaned$Period)
+```
+
+
+
